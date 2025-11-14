@@ -1,8 +1,14 @@
 import Link from 'next/link';
 import { PlusCircle, Building2, Laptop, ShoppingCart, Car } from 'lucide-react';
+import { PieChart, Pie, Cell } from 'recharts';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from '@/components/ui/chart';
 import { IssuesTable } from '@/components/issues-table';
 import { issues } from '@/lib/data';
 import { SidebarTrigger } from '@/components/ui/sidebar';
@@ -35,6 +41,40 @@ export default function Home() {
     },
   ];
 
+  const statusCounts = issues.reduce(
+    (acc, issue) => {
+      if (issue.status === 'Pending') acc.pending += 1;
+      if (issue.status === 'Accepted') acc.accepted += 1;
+      if (issue.status === 'Finished') acc.finished += 1;
+      return acc;
+    },
+    { pending: 0, accepted: 0, finished: 0 }
+  );
+
+  const chartData = [
+    { name: 'Pending', value: statusCounts.pending, fill: 'hsl(var(--chart-1))' },
+    { name: 'Accepted', value: statusCounts.accepted, fill: 'hsl(var(--chart-2))' },
+    { name: 'Finished', value: statusCounts.finished, fill: 'hsl(var(--chart-3))' },
+  ];
+
+  const chartConfig = {
+    value: {
+      label: 'Issues',
+    },
+    Pending: {
+      label: 'Pending',
+      color: 'hsl(var(--chart-1))',
+    },
+    Accepted: {
+      label: 'Accepted',
+      color: 'hsl(var(--chart-2))',
+    },
+    Finished: {
+      label: 'Finished',
+      color: 'hsl(var(--chart-3))',
+    },
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
       <header className="sticky top-0 z-10 flex items-center h-16 px-4 border-b bg-background/80 backdrop-blur-sm md:px-6">
@@ -65,6 +105,41 @@ export default function Home() {
               </Card>
             </Link>
           ))}
+        </div>
+        
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5 mb-8">
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle>Issue Status Overview</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ChartContainer
+                config={chartConfig}
+                className="mx-auto aspect-square max-h-[250px]"
+              >
+                <PieChart>
+                  <ChartTooltip
+                    cursor={false}
+                    content={<ChartTooltipContent hideLabel />}
+                  />
+                  <Pie
+                    data={chartData}
+                    dataKey="value"
+                    nameKey="name"
+                    innerRadius={50}
+                    strokeWidth={5}
+                  >
+                    {chartData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.fill} />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ChartContainer>
+            </CardContent>
+          </Card>
+          <div className="lg:col-span-3 hidden lg:block">
+            {/* Placeholder for future content */}
+          </div>
         </div>
 
         <Card>
