@@ -134,7 +134,12 @@ export default function Home() {
           <SidebarTrigger />
           <h1 className="text-2xl font-semibold">Dashboard</h1>
         </div>
-        <div className="ml-auto">
+        <div className="ml-auto flex items-center gap-2">
+          <Button asChild variant="outline">
+            <Link href="/report?category=Purchase">
+              <ShoppingCart className="mr-2 h-4 w-4" /> Purchase Request
+            </Link>
+          </Button>
           <Button asChild>
             <Link href="/report">
               <PlusCircle className="mr-2 h-4 w-4" /> New Issue
@@ -217,7 +222,7 @@ export default function Home() {
                         dominantBaseline="middle"
                         className="fill-foreground text-2xl font-bold"
                       >
-                        {Math.round((status.value / totalIssues) * 100)}%
+                        {totalIssues > 0 ? `${Math.round((status.value / totalIssues) * 100)}%` : '0%'}
                       </text>
                     </g>
                   </RadialBarChart>
