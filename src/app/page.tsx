@@ -58,22 +58,6 @@ export default function Home() {
     },
   ];
 
-  // Data for Status Pie Chart
-  const statusCounts = issues.reduce(
-    (acc, issue) => {
-      acc[issue.status] = (acc[issue.status] || 0) + 1;
-      return acc;
-    },
-    {} as Record<string, number>
-  );
-
-  const statusChartData = [
-    { name: 'Pending', value: statusCounts.Pending || 0, fill: 'hsl(var(--chart-1))' },
-    { name: 'Accepted', value: statusCounts.Accepted || 0, fill: 'hsl(var(--chart-2))' },
-    { name: 'Ongoing', value: statusCounts.Ongoing || 0, fill: 'hsl(var(--chart-3))'},
-    { name: 'Finished', value: statusCounts.Finished || 0, fill: 'hsl(var(--chart-4))' },
-  ];
-
   const statusChartConfig = {
     value: { label: 'Issues' },
     Pending: { label: 'Pending', color: 'hsl(var(--chart-1))' },
@@ -81,6 +65,28 @@ export default function Home() {
     Ongoing: { label: 'Ongoing', color: 'hsl(var(--chart-3))' },
     Finished: { label: 'Finished', color: 'hsl(var(--chart-4))' },
   };
+
+  const colors = ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))'];
+
+  const createCategoryStatusChartData = (category: string) => {
+    const categoryIssues = issues.filter(issue => issue.category === category);
+    const statusCounts = categoryIssues.reduce((acc, issue) => {
+      acc[issue.status] = (acc[issue.status] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    return [
+      { name: 'Pending', value: statusCounts.Pending || 0, fill: colors[0] },
+      { name: 'Accepted', value: statusCounts.Accepted || 0, fill: colors[1] },
+      { name: 'Ongoing', value: statusCounts.Ongoing || 0, fill: colors[2] },
+      { name: 'Finished', value: statusCounts.Finished || 0, fill: colors[3] },
+    ].filter(d => d.value > 0);
+  };
+  
+  const facilityStatusData = createCategoryStatusChartData('Facility');
+  const itStatusData = createCategoryStatusChartData('IT');
+  const purchaseStatusData = createCategoryStatusChartData('Purchase');
+
 
   // Data for Category Bar Chart
   const categoryCounts = issues.reduce(
@@ -157,7 +163,7 @@ export default function Home() {
         <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-3 mb-8">
           <Card>
             <CardHeader>
-              <CardTitle>Issue Status</CardTitle>
+              <CardTitle>Facility Issue Status</CardTitle>
             </CardHeader>
             <CardContent>
               <ChartContainer
@@ -170,13 +176,13 @@ export default function Home() {
                     content={<ChartTooltipContent hideLabel />}
                   />
                   <Pie
-                    data={statusChartData}
+                    data={facilityStatusData}
                     dataKey="value"
                     nameKey="name"
                     innerRadius={50}
                     strokeWidth={5}
                   >
-                    {statusChartData.map((entry, index) => (
+                    {facilityStatusData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.fill} />
                     ))}
                   </Pie>
@@ -184,6 +190,67 @@ export default function Home() {
               </ChartContainer>
             </CardContent>
           </Card>
+           <Card>
+            <CardHeader>
+              <CardTitle>IT Issue Status</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ChartContainer
+                config={statusChartConfig}
+                className="mx-auto aspect-square max-h-[250px]"
+              >
+                <PieChart>
+                  <ChartTooltip
+                    cursor={false}
+                    content={<ChartTooltipContent hideLabel />}
+                  />
+                  <Pie
+                    data={itStatusData}
+                    dataKey="value"
+                    nameKey="name"
+                    innerRadius={50}
+                    strokeWidth={5}
+                  >
+                    {itStatusData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.fill} />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ChartContainer>
+            </CardContent>
+          </Card>
+           <Card>
+            <CardHeader>
+              <CardTitle>Purchase Issue Status</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ChartContainer
+                config={statusChartConfig}
+                className="mx-auto aspect-square max-h-[250px]"
+              >
+                <PieChart>
+                  <ChartTooltip
+                    cursor={false}
+                    content={<ChartTooltipContent hideLabel />}
+                  />
+                  <Pie
+                    data={purchaseStatusData}
+                    dataKey="value"
+                    nameKey="name"
+                    innerRadius={50}
+                    strokeWidth={5}
+                  >
+                    {purchaseStatusData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.fill} />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ChartContainer>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2 mb-8">
           <Card>
             <CardHeader>
               <CardTitle>Issues by Category</CardTitle>
