@@ -1,5 +1,5 @@
 export type Status = 'Pending' | 'Accepted' | 'Ongoing' | 'Finished';
-export type Category = 'Facility' | 'IT' | 'Purchase';
+export type Category = 'Facility' | 'IT' | 'Purchase' | 'Vehicle';
 
 export type SubCategory =
   | 'External'
@@ -8,7 +8,9 @@ export type SubCategory =
   | 'Software'
   | 'Office Machines'
   | 'Internet'
-  | 'Repair';
+  | 'Repair'
+  | 'Maintenance'
+  | 'Accident';
 
 export type Role = 'Operations Manager' | 'IT Manager' | 'Purchaser' | 'Admin Director';
 

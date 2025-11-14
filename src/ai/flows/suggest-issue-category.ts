@@ -33,7 +33,7 @@ const prompt = ai.definePrompt({
   name: 'suggestIssueCategoryPrompt',
   input: {schema: SuggestIssueCategoryInputSchema},
   output: {schema: SuggestIssueCategoryOutputSchema},
-  prompt: `Given the following issue description, suggest the most relevant categories from the following list: Facility (external, internal), IT (hardware, software, office machines, internet, repair), Purchase. Return only the categories that are relevant, do not return any categories that are not relevant. Categories should be returned as a JSON array of strings.
+  prompt: `Given the following issue description, suggest the most relevant categories from the following list: Facility (external, internal), IT (hardware, software, office machines, internet, repair), Purchase, Vehicle (maintenance, repair, accident). Return only the categories that are relevant, do not return any categories that are not relevant. Categories should be returned as a JSON array of strings.
 
 Issue Description: {{{issueDescription}}}`,
 });
