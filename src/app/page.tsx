@@ -7,11 +7,12 @@ import {
   Laptop,
   ShoppingCart,
   Car,
+  CircleHelp,
+  CircleCheck,
+  RefreshCw,
+  CheckCircle,
 } from 'lucide-react';
 import {
-  PieChart,
-  Pie,
-  Cell,
   BarChart,
   Bar,
   XAxis,
@@ -58,35 +59,36 @@ export default function Home() {
     },
   ];
 
-  const statusChartConfig = {
-    value: { label: 'Issues' },
-    Pending: { label: 'Pending', color: 'hsl(var(--chart-1))' },
-    Accepted: { label: 'Accepted', color: 'hsl(var(--chart-2))' },
-    Ongoing: { label: 'Ongoing', color: 'hsl(var(--chart-3))' },
-    Finished: { label: 'Finished', color: 'hsl(var(--chart-4))' },
-  };
-
-  const colors = ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))'];
-
-  const createCategoryStatusChartData = (category: string) => {
-    const categoryIssues = issues.filter(issue => issue.category === category);
-    const statusCounts = categoryIssues.reduce((acc, issue) => {
+  const statusCounts = issues.reduce(
+    (acc, issue) => {
       acc[issue.status] = (acc[issue.status] || 0) + 1;
       return acc;
-    }, {} as Record<string, number>);
+    },
+    {} as Record<string, number>
+  );
 
-    return [
-      { name: 'Pending', value: statusCounts.Pending || 0, fill: colors[0] },
-      { name: 'Accepted', value: statusCounts.Accepted || 0, fill: colors[1] },
-      { name: 'Ongoing', value: statusCounts.Ongoing || 0, fill: colors[2] },
-      { name: 'Finished', value: statusCounts.Finished || 0, fill: colors[3] },
-    ].filter(d => d.value > 0);
-  };
-  
-  const facilityStatusData = createCategoryStatusChartData('Facility');
-  const itStatusData = createCategoryStatusChartData('IT');
-  const purchaseStatusData = createCategoryStatusChartData('Purchase');
-
+  const statusCards = [
+    {
+      title: 'Total Received',
+      count: statusCounts.Pending || 0,
+      icon: <CircleHelp className="h-8 w-8 text-primary" />,
+    },
+    {
+      title: 'Total Accepted',
+      count: statusCounts.Accepted || 0,
+      icon: <CircleCheck className="h-8 w-8 text-primary" />,
+    },
+    {
+      title: 'Total Ongoing',
+      count: statusCounts.Ongoing || 0,
+      icon: <RefreshCw className="h-8 w-8 text-primary" />,
+    },
+    {
+      title: 'Total Finished',
+      count: statusCounts.Finished || 0,
+      icon: <CheckCircle className="h-8 w-8 text-primary" />,
+    },
+  ];
 
   // Data for Category Bar Chart
   const categoryCounts = issues.reduce(
@@ -160,94 +162,18 @@ export default function Home() {
           ))}
         </div>
 
-        <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-3 mb-8">
-          <Card>
-            <CardHeader>
-              <CardTitle>Facility Issue Status</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ChartContainer
-                config={statusChartConfig}
-                className="mx-auto aspect-square max-h-[250px]"
-              >
-                <PieChart>
-                  <ChartTooltip
-                    cursor={false}
-                    content={<ChartTooltipContent hideLabel />}
-                  />
-                  <Pie
-                    data={facilityStatusData}
-                    dataKey="value"
-                    nameKey="name"
-                    innerRadius={50}
-                    strokeWidth={5}
-                  >
-                    {facilityStatusData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.fill} />
-                    ))}
-                  </Pie>
-                </PieChart>
-              </ChartContainer>
-            </CardContent>
-          </Card>
-           <Card>
-            <CardHeader>
-              <CardTitle>IT Issue Status</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ChartContainer
-                config={statusChartConfig}
-                className="mx-auto aspect-square max-h-[250px]"
-              >
-                <PieChart>
-                  <ChartTooltip
-                    cursor={false}
-                    content={<ChartTooltipContent hideLabel />}
-                  />
-                  <Pie
-                    data={itStatusData}
-                    dataKey="value"
-                    nameKey="name"
-                    innerRadius={50}
-                    strokeWidth={5}
-                  >
-                    {itStatusData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.fill} />
-                    ))}
-                  </Pie>
-                </PieChart>
-              </ChartContainer>
-            </CardContent>
-          </Card>
-           <Card>
-            <CardHeader>
-              <CardTitle>Purchase Issue Status</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ChartContainer
-                config={statusChartConfig}
-                className="mx-auto aspect-square max-h-[250px]"
-              >
-                <PieChart>
-                  <ChartTooltip
-                    cursor={false}
-                    content={<ChartTooltipContent hideLabel />}
-                  />
-                  <Pie
-                    data={purchaseStatusData}
-                    dataKey="value"
-                    nameKey="name"
-                    innerRadius={50}
-                    strokeWidth={5}
-                  >
-                    {purchaseStatusData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.fill} />
-                    ))}
-                  </Pie>
-                </PieChart>
-              </ChartContainer>
-            </CardContent>
-          </Card>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
+          {statusCards.map((card) => (
+            <Card key={card.title}>
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-lg font-medium">{card.title}</CardTitle>
+                {card.icon}
+              </CardHeader>
+              <CardContent>
+                <div className="text-4xl font-bold">{card.count}</div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
         <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2 mb-8">
