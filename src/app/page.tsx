@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import { PlusCircle, Building2, Laptop, ShoppingCart, Car } from 'lucide-react';
 import { PieChart, Pie, Cell } from 'recharts';
