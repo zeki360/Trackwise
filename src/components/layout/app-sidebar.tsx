@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -9,7 +10,7 @@ import {
   SidebarContent,
   SidebarFooter,
 } from '@/components/ui/sidebar';
-import { Home, PlusCircle, UserCircle } from 'lucide-react';
+import { Home, PlusCircle, UserCircle, List } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -43,6 +44,14 @@ export function AppSidebar() {
               <Link href="/">
                 <Home />
                 <span>Dashboard</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild isActive={pathname.startsWith('/issues')} tooltip="Issues">
+              <Link href="/issues">
+                <List />
+                <span>Issues</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
