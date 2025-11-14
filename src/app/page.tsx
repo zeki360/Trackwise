@@ -9,6 +9,7 @@ import {
   ShoppingCart,
   Car,
 } from 'lucide-react';
+import { useState } from 'react';
 import {
   BarChart,
   Bar,
@@ -27,11 +28,30 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart';
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/components/ui/tabs';
 import { IssuesTable } from '@/components/issues-table';
 import { issues } from '@/lib/data';
+import type { Issue, Status } from '@/lib/types';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 
 export default function Home() {
+  const [filteredIssues, setFilteredIssues] = useState<Issue[]>(issues);
+
+  const handleTabChange = (status: string) => {
+    if (status === 'All') {
+      setFilteredIssues(issues);
+    } else {
+      setFilteredIssues(
+        issues.filter((issue) => issue.status === status)
+      );
+    }
+  };
+
   const categories = [
     {
       name: 'Facility',
@@ -282,7 +302,30 @@ export default function Home() {
             <CardTitle>Recent Issues</CardTitle>
           </CardHeader>
           <CardContent>
-            <IssuesTable issues={issues} />
+            <Tabs defaultValue="All" onValueChange={handleTabChange}>
+              <TabsList>
+                <TabsTrigger value="All">All</TabsTrigger>
+                <TabsTrigger value="Pending">Pending</TabsTrigger>
+                <TabsTrigger value="Accepted">Accepted</TabsTrigger>
+                <TabsTrigger value="Ongoing">Ongoing</TabsTrigger>
+                <TabsTrigger value="Finished">Finished</TabsTrigger>
+              </TabsList>
+              <TabsContent value="All">
+                <IssuesTable issues={filteredIssues} />
+              </TabsContent>
+              <TabsContent value="Pending">
+                <IssuesTable issues={filteredIssues} />
+              </TabsContent>
+              <TabsContent value="Accepted">
+                <IssuesTable issues={filteredIssues} />
+              </TabsContent>
+              <TabsContent value="Ongoing">
+                <IssuesTable issues={filteredIssues} />
+              </TabsContent>
+              <TabsContent value="Finished">
+                <IssuesTable issues={filteredIssues} />
+              </TabsContent>
+            </Tabs>
           </CardContent>
         </Card>
       </main>
