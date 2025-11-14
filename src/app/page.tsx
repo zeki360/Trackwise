@@ -95,18 +95,21 @@ export default function Home() {
     issues: categoryCounts[category],
   }));
 
-  // Data for Assignee Bar Chart
-  const assigneeCounts = issues.reduce(
+  // Data for Assignee Bar Chart (Fixed Issues)
+  const fixedIssues = issues.filter((issue) => issue.status === 'Finished');
+  const assigneeFixedCounts = fixedIssues.reduce(
     (acc, issue) => {
       acc[issue.assignedTo] = (acc[issue.assignedTo] || 0) + 1;
       return acc;
     },
     {} as Record<string, number>
   );
-  const assigneeChartData = Object.keys(assigneeCounts).map((assignee) => ({
-    name: assignee,
-    issues: assigneeCounts[assignee],
-  }));
+  const assigneeChartData = Object.keys(assigneeFixedCounts).map(
+    (assignee) => ({
+      name: assignee,
+      issues: assigneeFixedCounts[assignee],
+    })
+  );
 
   const barChartConfig = {
     issues: {
@@ -204,7 +207,7 @@ export default function Home() {
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle>Issues by Assignee</CardTitle>
+              <CardTitle>Fixed Issues by Assignee</CardTitle>
             </CardHeader>
             <CardContent>
               <ChartContainer config={barChartConfig} className="h-[250px] w-full">
