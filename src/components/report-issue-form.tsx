@@ -33,7 +33,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/
 const formSchema = z.object({
   title: z.string().min(5, 'Title must be at least 5 characters long.'),
   description: z.string().min(10, 'Description must be at least 10 characters long.'),
-  category: z.enum(['Facility', 'IT', 'Purchase'], {required_error: "Please select a category."}),
+  category: z.enum(['Facility', 'IT', 'Purchase', 'Vehicle'], {required_error: "Please select a category."}),
   subCategory: z.string().optional(),
 });
 
@@ -43,6 +43,7 @@ const subCategories = {
   Facility: ['Internal', 'External'],
   IT: ['Hardware', 'Software', 'Office Machines', 'Internet', 'Repair'],
   Purchase: [],
+  Vehicle: ['Maintenance', 'Repair', 'Accident'],
 };
 
 export function ReportIssueForm() {
@@ -58,7 +59,7 @@ export function ReportIssueForm() {
     defaultValues: {
       title: '',
       description: '',
-      category: defaultCategory && ['Facility', 'IT', 'Purchase'].includes(defaultCategory) ? (defaultCategory as 'Facility' | 'IT' | 'Purchase') : undefined,
+      category: defaultCategory && ['Facility', 'IT', 'Purchase', 'Vehicle'].includes(defaultCategory) ? (defaultCategory as 'Facility' | 'IT' | 'Purchase' | 'Vehicle') : undefined,
     },
   });
 
@@ -175,7 +176,7 @@ export function ReportIssueForm() {
                     type="button"
                     variant="secondary"
                     onClick={() => {
-                      if (['Facility', 'IT', 'Purchase'].includes(suggestion)){
+                      if (['Facility', 'IT', 'Purchase', 'Vehicle'].includes(suggestion)){
                         form.setValue('category', suggestion as FormValues['category'], { shouldValidate: true });
                         form.setValue('subCategory', undefined);
                       } else {
@@ -214,6 +215,7 @@ export function ReportIssueForm() {
                       <SelectItem value="Facility">Facility</SelectItem>
                       <SelectItem value="IT">IT</SelectItem>
                       <SelectItem value="Purchase">Purchase</SelectItem>
+                      <SelectItem value="Vehicle">Vehicle</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

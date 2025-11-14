@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { PlusCircle, Building2, Laptop, ShoppingCart } from 'lucide-react';
+import { PlusCircle, Building2, Laptop, ShoppingCart, Car } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -27,6 +27,12 @@ export default function Home() {
       description: 'Submit a new purchase request.',
       href: '/report?category=Purchase',
     },
+    {
+      name: 'Vehicle',
+      icon: <Car className="h-8 w-8 text-primary" />,
+      description: 'Report issues with company vehicles.',
+      href: '/report?category=Vehicle',
+    },
   ];
 
   return (
@@ -45,7 +51,7 @@ export default function Home() {
         </div>
       </header>
       <main className="flex-1 p-4 md:p-8">
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
           {categories.map((category) => (
             <Link href={category.href} key={category.name}>
               <Card className="hover:bg-accent/20 transition-colors h-full flex flex-col">
