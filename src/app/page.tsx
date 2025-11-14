@@ -95,19 +95,19 @@ export default function Home() {
     issues: categoryCounts[category],
   }));
 
-  // Data for Assignee Bar Chart (Fixed Issues)
+  // Data for Category Bar Chart (Fixed Issues)
   const fixedIssues = issues.filter((issue) => issue.status === 'Finished');
-  const assigneeFixedCounts = fixedIssues.reduce(
+  const categoryFixedCounts = fixedIssues.reduce(
     (acc, issue) => {
-      acc[issue.assignedTo] = (acc[issue.assignedTo] || 0) + 1;
+      acc[issue.category] = (acc[issue.category] || 0) + 1;
       return acc;
     },
     {} as Record<string, number>
   );
-  const assigneeChartData = Object.keys(assigneeFixedCounts).map(
-    (assignee) => ({
-      name: assignee,
-      issues: assigneeFixedCounts[assignee],
+  const fixedByCategoryChartData = Object.keys(categoryFixedCounts).map(
+    (category) => ({
+      name: category,
+      issues: categoryFixedCounts[category],
     })
   );
 
@@ -207,20 +207,19 @@ export default function Home() {
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle>Fixed Issues by Assignee</CardTitle>
+              <CardTitle>Fixed Issues by Category</CardTitle>
             </CardHeader>
             <CardContent>
               <ChartContainer config={barChartConfig} className="h-[250px] w-full">
-                <BarChart accessibilityLayer data={assigneeChartData} layout="vertical" margin={{ top: 20, right: 20, bottom: 20, left: 40 }}>
-                  <CartesianGrid horizontal={false} />
-                  <YAxis
+                <BarChart accessibilityLayer data={fixedByCategoryChartData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+                  <CartesianGrid vertical={false} />
+                  <XAxis
                     dataKey="name"
-                    type="category"
                     tickLine={false}
                     tickMargin={10}
                     axisLine={false}
                   />
-                  <XAxis type="number" />
+                  <YAxis />
                   <ChartTooltip content={<ChartTooltipContent hideLabel />} />
                   <Bar dataKey="issues" fill="var(--color-issues)" radius={4} />
                 </BarChart>
