@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -7,10 +8,6 @@ import {
   Laptop,
   ShoppingCart,
   Car,
-  CircleHelp,
-  CircleCheck,
-  RefreshCw,
-  CheckCircle,
 } from 'lucide-react';
 import {
   BarChart,
@@ -18,6 +15,9 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
+  RadialBarChart,
+  RadialBar,
+  PolarAngleAxis,
 } from 'recharts';
 
 import { Button } from '@/components/ui/button';
@@ -59,6 +59,7 @@ export default function Home() {
     },
   ];
 
+  const totalIssues = issues.length;
   const statusCounts = issues.reduce(
     (acc, issue) => {
       acc[issue.status] = (acc[issue.status] || 0) + 1;
@@ -67,26 +68,26 @@ export default function Home() {
     {} as Record<string, number>
   );
 
-  const statusCards = [
+  const statusChartData = [
     {
-      title: 'Total Received',
-      count: statusCounts.Pending || 0,
-      icon: <CircleHelp className="h-8 w-8 text-primary" />,
+      name: 'Received',
+      value: statusCounts.Pending || 0,
+      fill: 'hsl(var(--chart-1))',
     },
     {
-      title: 'Total Accepted',
-      count: statusCounts.Accepted || 0,
-      icon: <CircleCheck className="h-8 w-8 text-primary" />,
+      name: 'Accepted',
+      value: statusCounts.Accepted || 0,
+      fill: 'hsl(var(--chart-2))',
     },
     {
-      title: 'Total Ongoing',
-      count: statusCounts.Ongoing || 0,
-      icon: <RefreshCw className="h-8 w-8 text-primary" />,
+      name: 'Ongoing',
+      value: statusCounts.Ongoing || 0,
+      fill: 'hsl(var(--chart-3))',
     },
     {
-      title: 'Total Finished',
-      count: statusCounts.Finished || 0,
-      icon: <CheckCircle className="h-8 w-8 text-primary" />,
+      name: 'Finished',
+      value: statusCounts.Finished || 0,
+      fill: 'hsl(var(--chart-4))',
     },
   ];
 
@@ -163,14 +164,64 @@ export default function Home() {
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
-          {statusCards.map((card) => (
-            <Card key={card.title}>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-lg font-medium">{card.title}</CardTitle>
-                {card.icon}
+          {statusChartData.map((status) => (
+            <Card key={status.name}>
+              <CardHeader className="items-center pb-0">
+                <CardTitle className="text-base font-medium">
+                  {`Total ${status.name}`}
+                </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="text-4xl font-bold">{card.count}</div>
+              <CardContent className="flex-1 pb-0">
+                <ChartContainer
+                  config={{
+                    [status.name]: {
+                      label: status.name,
+                      color: status.fill,
+                    },
+                  }}
+                  className="mx-auto aspect-square h-[150px]"
+                >
+                  <RadialBarChart
+                    data={[status]}
+                    startAngle={-90}
+                    endAngle={270}
+                    innerRadius="70%"
+                    outerRadius="100%"
+                    barSize={12}
+                    margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
+                  >
+                    <PolarAngleAxis
+                      type="number"
+                      domain={[0, totalIssues]}
+                      angleAxisId={0}
+                      tick={false}
+                    />
+                    <RadialBar
+                      background
+                      dataKey="value"
+                      cornerRadius={10}
+                      className="fill-[var(--color-value)]"
+                    />
+                    <ChartTooltip
+                      cursor={false}
+                      content={<ChartTooltipContent hideLabel />}
+                    />
+                    <g
+                      className="transform -translate-y-1/2"
+                      transform="translate(50%, 50%)"
+                    >
+                      <text
+                        x="0"
+                        y="0"
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        className="fill-foreground text-2xl font-bold"
+                      >
+                        {Math.round((status.value / totalIssues) * 100)}%
+                      </text>
+                    </g>
+                  </RadialBarChart>
+                </ChartContainer>
               </CardContent>
             </Card>
           ))}
