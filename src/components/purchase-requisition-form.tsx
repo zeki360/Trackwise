@@ -53,6 +53,8 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
+const generateUniqueItemCode = () => `ITEM-${Date.now()}-${Math.floor(Math.random() * 100)}`;
+
 export function PurchaseRequisitionForm() {
   const router = useRouter();
   const { toast } = useToast();
@@ -64,7 +66,7 @@ export function PurchaseRequisitionForm() {
       urgency: 'Routine',
       requestedBy: '',
       storeRequisitionNo: '',
-      items: [{ description: '', unitOfMeasure: '', quantity: 1 }],
+      items: [{ itemCode: generateUniqueItemCode(), description: '', unitOfMeasure: '', quantity: 1, remark: '' }],
       preparedBy: '',
       checkedBy: '',
       approvedBy: '',
@@ -188,7 +190,7 @@ export function PurchaseRequisitionForm() {
                       <FormField
                         control={form.control}
                         name={`items.${index}.itemCode`}
-                        render={({ field }) => <Input {...field} placeholder="Optional" />}
+                        render={({ field }) => <Input {...field} placeholder="Unique Code" readOnly />}
                       />
                     </TableCell>
                     <TableCell>
@@ -252,7 +254,7 @@ export function PurchaseRequisitionForm() {
             variant="outline"
             size="sm"
             onClick={() =>
-              append({ description: '', unitOfMeasure: '', quantity: 1 })
+              append({ itemCode: generateUniqueItemCode(), description: '', unitOfMeasure: '', quantity: 1, remark: '' })
             }
           >
             <PlusCircle className="mr-2 h-4 w-4" />
@@ -309,3 +311,5 @@ export function PurchaseRequisitionForm() {
     </Form>
   );
 }
+
+    
