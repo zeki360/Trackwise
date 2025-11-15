@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import {
   Card,
@@ -18,54 +18,39 @@ import {
 } from '@/components/ui/tabs';
 import { IssuesTable } from '@/components/issues-table';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
-import { collection, query, where, Query, DocumentData } from 'firebase/firestore';
 import type { Issue, Category } from '@/lib/types';
-import { Loader2 } from 'lucide-react';
+import { issues as staticIssues } from '@/lib/data';
 
-function IssuesPageContent() {
+export default function IssuesPage() {
   const searchParams = useSearchParams();
   const initialCategory = searchParams.get('category') as Category | null;
-  
-  const { user } = useUser();
-  const firestore = useFirestore();
 
-  const issuesQuery = useMemoFirebase(() => {
-    if (!user || !firestore) return null;
-
-    const baseCollection = collection(firestore, 'users', user.uid, 'issues');
-
-    if (initialCategory) {
-      return query(baseCollection, where('category', '==', initialCategory));
-    }
-    return baseCollection;
-  }, [user, firestore, initialCategory]);
-
-  const { data: allIssues, isLoading } = useCollection<Issue>(issuesQuery);
-  
+  const [allIssues, setAllIssues] = useState<Issue[]>([]);
   const [filteredIssues, setFilteredIssues] = useState<Issue[]>([]);
   const [activeTab, setActiveTab] = useState('All');
 
-  const handleTabChange = (status: string, issuesToFilter: Issue[] | null = allIssues) => {
-    setActiveTab(status);
-    if (!issuesToFilter) {
-      setFilteredIssues([]);
-      return;
+  useEffect(() => {
+    let issuesToLoad = staticIssues;
+    if (initialCategory) {
+      issuesToLoad = staticIssues.filter(
+        (issue) => issue.category === initialCategory
+      );
     }
+    setAllIssues(issuesToLoad);
+    setFilteredIssues(issuesToLoad);
+    setActiveTab('All');
+  }, [initialCategory]);
+
+  const handleTabChange = (status: string) => {
+    setActiveTab(status);
     if (status === 'All') {
-      setFilteredIssues(issuesToFilter);
+      setFilteredIssues(allIssues);
     } else {
       setFilteredIssues(
-        issuesToFilter.filter((issue) => issue.status === status)
+        allIssues.filter((issue) => issue.status === status)
       );
     }
   };
-
-  useEffect(() => {
-    // This effect now correctly handles changes in allIssues and activeTab.
-    // It will re-filter the issues whenever the source data or the selected tab changes.
-    handleTabChange(activeTab, allIssues);
-  }, [allIssues, activeTab]);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -84,39 +69,21 @@ function IssuesPageContent() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {isLoading ? (
-               <div className="flex justify-center items-center h-64">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              </div>
-            ) : (
-              <Tabs value={activeTab} onValueChange={(value) => handleTabChange(value)}>
-                <TabsList>
-                  <TabsTrigger value="All">All</TabsTrigger>
-                  <TabsTrigger value="Pending">Pending</TabsTrigger>
-                  <TabsTrigger value="Accepted">Accepted</TabsTrigger>
-                  <TabsTrigger value="Ongoing">Ongoing</TabsTrigger>
-                  <TabsTrigger value="Finished">Finished</TabsTrigger>
-                </TabsList>
-                <TabsContent value={activeTab}>
-                  <IssuesTable issues={filteredIssues} />
-                </TabsContent>
-              </Tabs>
-            )}
+            <Tabs value={activeTab} onValueChange={handleTabChange}>
+              <TabsList>
+                <TabsTrigger value="All">All</TabsTrigger>
+                <TabsTrigger value="Pending">Pending</TabsTrigger>
+                <TabsTrigger value="Accepted">Accepted</TabsTrigger>
+                <TabsTrigger value="Ongoing">Ongoing</TabsTrigger>
+                <TabsTrigger value="Finished">Finished</TabsTrigger>
+              </TabsList>
+              <TabsContent value={activeTab}>
+                <IssuesTable issues={filteredIssues} />
+              </TabsContent>
+            </Tabs>
           </CardContent>
         </Card>
       </main>
     </div>
   );
-}
-
-export default function IssuesPage() {
-    return (
-        <Suspense fallback={
-          <div className="flex h-screen w-full items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
-        }>
-            <IssuesPageContent />
-        </Suspense>
-    )
 }
