@@ -1,3 +1,5 @@
+import { Timestamp } from "firebase/firestore";
+
 export type Status = 'Pending' | 'Accepted' | 'Ongoing' | 'Finished';
 export type Category = 'Facility' | 'IT' | 'Purchase' | 'Vehicle';
 
@@ -23,7 +25,6 @@ export type Role =
   | 'Operations Manager'
   | 'IT Manager'
   | 'IT officer'
-  | 'Purchaser'
   | 'Staff';
 
 export interface Issue {
@@ -34,5 +35,7 @@ export interface Issue {
   subCategory?: SubCategory;
   status: Status;
   assignedTo: Role;
-  createdAt: Date;
+  reportedBy: string;
+  createdAt: Date | Timestamp;
+  dateReported?: Date | Timestamp;
 }

@@ -9,6 +9,7 @@ import {
   ShoppingCart,
   Car,
   List,
+  Loader2,
 } from 'lucide-react';
 import {
   BarChart,
@@ -29,10 +30,25 @@ import {
   ChartTooltipContent,
 } from '@/components/ui/chart';
 
-import { issues } from '@/lib/data';
+import { issues as staticIssues } from '@/lib/data';
 import { SidebarTrigger } from '@/components/ui/sidebar';
+import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
+import { collection, query, where } from 'firebase/firestore';
+import type { Issue } from '@/lib/types';
+
 
 export default function Home() {
+  const { user, isUserLoading } = useUser();
+  const firestore = useFirestore();
+
+  const issuesQuery = useMemoFirebase(() => {
+    if (!user || !firestore) return null;
+    return query(collection(firestore, 'users', user.uid, 'issues'));
+  }, [user, firestore]);
+  
+  const { data: issues, isLoading: isIssuesLoading } = useCollection<Issue>(issuesQuery);
+
+
   const categories = [
     {
       name: 'Facility',
@@ -60,8 +76,10 @@ export default function Home() {
     },
   ];
 
-  const totalIssues = issues.length;
-  const statusCounts = issues.reduce(
+  const safeIssues = issues || [];
+
+  const totalIssues = safeIssues.length;
+  const statusCounts = safeIssues.reduce(
     (acc, issue) => {
       acc[issue.status] = (acc[issue.status] || 0) + 1;
       return acc;
@@ -93,7 +111,7 @@ export default function Home() {
   ];
 
   // Data for Category Bar Chart
-  const categoryCounts = issues.reduce(
+  const categoryCounts = safeIssues.reduce(
     (acc, issue) => {
       acc[issue.category] = (acc[issue.category] || 0) + 1;
       return acc;
@@ -106,7 +124,7 @@ export default function Home() {
   }));
 
   // Data for Category Bar Chart (Fixed Issues)
-  const fixedIssues = issues.filter((issue) => issue.status === 'Finished');
+  const fixedIssues = safeIssues.filter((issue) => issue.status === 'Finished');
   const categoryFixedCounts = fixedIssues.reduce(
     (acc, issue) => {
       acc[issue.category] = (acc[issue.category] || 0) + 1;
@@ -127,6 +145,14 @@ export default function Home() {
       color: 'hsl(var(--chart-1))',
     },
   };
+
+  if (isUserLoading || (user && isIssuesLoading)) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-screen">

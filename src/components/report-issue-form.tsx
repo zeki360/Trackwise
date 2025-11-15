@@ -4,8 +4,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { useState, useTransition } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Sparkles, Loader2 } from 'lucide-react';
+import { useAuth, useFirestore, addDocumentNonBlocking } from '@/firebase';
+import { collection, serverTimestamp } from 'firebase/firestore';
+
 
 import { Button } from '@/components/ui/button';
 import {
@@ -29,6 +32,8 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { getCategorySuggestion } from '@/lib/actions';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import type { Role } from '@/lib/types';
+
 
 const formSchema = z.object({
   title: z.string().min(5, 'Title must be at least 5 characters long.'),
@@ -46,9 +51,19 @@ const subCategories = {
   Vehicle: ['Maintenance', 'Repair', 'Accident'],
 };
 
+const categoryToAssignee: Record<FormValues['category'], Role> = {
+    'Facility': 'Operations Manager',
+    'IT': 'IT Manager',
+    'Purchase': 'Purchaser',
+    'Vehicle': 'Operations Manager',
+};
+
 export function ReportIssueForm() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const { toast } = useToast();
+  const { user } = useAuth();
+  const firestore = useFirestore();
   const [isSuggesting, startSuggestionTransition] = useTransition();
   const [suggestions, setSuggestions] = useState<string[]>([]);
 
@@ -101,14 +116,46 @@ export function ReportIssueForm() {
     });
   }
   
-  function onSubmit(values: FormValues) {
-    console.log(values);
-    toast({
-      title: 'Issue Reported!',
-      description: `Your issue "${values.title}" has been submitted.`,
-    });
-    form.reset();
-    setSuggestions([]);
+  async function onSubmit(values: FormValues) {
+    if (!user) {
+      toast({
+        variant: 'destructive',
+        title: 'Not Authenticated',
+        description: 'You must be logged in to report an issue.',
+      });
+      return;
+    }
+
+    const assignedTo = categoryToAssignee[values.category] || 'Admin Director';
+
+    const newIssue = {
+        ...values,
+        title: values.title,
+        status: 'Pending',
+        reportedBy: user.uid,
+        assignedTo: assignedTo,
+        dateReported: serverTimestamp(),
+    };
+
+    try {
+        const issuesCollection = collection(firestore, 'users', user.uid, 'issues');
+        await addDocumentNonBlocking(issuesCollection, newIssue);
+
+        toast({
+            title: 'Issue Reported!',
+            description: `Your issue "${values.title}" has been submitted.`,
+        });
+        form.reset();
+        setSuggestions([]);
+        router.push('/issues');
+    } catch(e) {
+        console.error("Error submitting issue:", e);
+        toast({
+            variant: "destructive",
+            title: "Submission failed",
+            description: "Could not report the issue. Please try again."
+        });
+    }
   }
 
   return (
