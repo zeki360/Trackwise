@@ -46,19 +46,6 @@ function IssuesPageContent() {
   const [filteredIssues, setFilteredIssues] = useState<Issue[]>([]);
   const [activeTab, setActiveTab] = useState('All');
 
-  useEffect(() => {
-    // We need to ensure allIssues is not null before proceeding.
-    // The useCollection hook will return null for its data property
-    // when the query is null (i.e. user or firestore is not ready).
-    if (allIssues) {
-      handleTabChange(activeTab, allIssues);
-    } else {
-      // If allIssues is null (e.g., during initial load or if query is null),
-      // ensure filteredIssues is an empty array.
-      setFilteredIssues([]);
-    }
-  }, [allIssues, activeTab]);
-
   const handleTabChange = (status: string, issuesToFilter: Issue[] | null = allIssues) => {
     setActiveTab(status);
     if (!issuesToFilter) {
@@ -73,6 +60,12 @@ function IssuesPageContent() {
       );
     }
   };
+
+  useEffect(() => {
+    // This effect now correctly handles changes in allIssues and activeTab.
+    // It will re-filter the issues whenever the source data or the selected tab changes.
+    handleTabChange(activeTab, allIssues);
+  }, [allIssues, activeTab]);
 
   return (
     <div className="flex flex-col min-h-screen">
