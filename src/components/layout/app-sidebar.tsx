@@ -10,7 +10,7 @@ import {
   SidebarContent,
   SidebarFooter,
 } from '@/components/ui/sidebar';
-import { Home, PlusCircle, UserCircle, List, BarChart2 } from 'lucide-react';
+import { Home, PlusCircle, UserCircle, List, BarChart2, ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -61,6 +61,14 @@ export function AppSidebar() {
               <Link href="/analytics">
                 <BarChart2 />
                 <span>Analytics</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+           <SidebarMenuItem>
+            <SidebarMenuButton asChild isActive={pathname === '/purchase-requisition'} tooltip="Purchase Request">
+              <Link href="/purchase-requisition">
+                <ShoppingCart />
+                <span>Purchase Request</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
