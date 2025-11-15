@@ -190,70 +190,74 @@ export function PurchaseRequisitionForm() {
 
         <div className="space-y-4">
           <FormLabel>Items</FormLabel>
-          <div className="border rounded-md">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Description</TableHead>
-                  <TableHead className="w-[150px]">Unit of Measure</TableHead>
-                  <TableHead className="w-[100px]">Quantity</TableHead>
-                  <TableHead>Remark</TableHead>
-                  <TableHead className="w-[50px]"></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {fields.map((item, index) => (
-                  <TableRow key={item.id}>
-                    <TableCell>
-                      <FormField
-                        control={form.control}
-                        name={`items.${index}.description`}
-                        render={({ field }) => (
-                          <Textarea {...field} placeholder="Item description..."/>
-                        )}
-                      />
-                      <FormMessage>{form.formState.errors.items?.[index]?.description?.message}</FormMessage>
-                    </TableCell>
-                    <TableCell>
-                      <FormField
-                        control={form.control}
-                        name={`items.${index}.unitOfMeasure`}
-                        render={({ field }) => <Input {...field} placeholder="e.g., pcs, kg" />}
-                      />
-                       <FormMessage>{form.formState.errors.items?.[index]?.unitOfMeasure?.message}</FormMessage>
-                    </TableCell>
-                    <TableCell>
-                      <FormField
-                        control={form.control}
-                        name={`items.${index}.quantity`}
-                        render={({ field }) => (
-                          <Input type="number" {...field} />
-                        )}
-                      />
-                      <FormMessage>{form.formState.errors.items?.[index]?.quantity?.message}</FormMessage>
-                    </TableCell>
-                    <TableCell>
-                      <FormField
-                        control={form.control}
-                        name={`items.${index}.remark`}
-                        render={({ field }) => <Input {...field} placeholder="Optional" />}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      {fields.length > 1 && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => remove(index)}
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+          <div className="space-y-6">
+            {fields.map((item, index) => (
+              <div key={item.id} className="border rounded-md p-4 space-y-4 relative">
+                 <FormField
+                    control={form.control}
+                    name={`items.${index}.description`}
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Item Description</FormLabel>
+                            <FormControl>
+                                <Textarea {...field} placeholder="Full description of the item..."/>
+                            </FormControl>
+                            <FormMessage>{form.formState.errors.items?.[index]?.description?.message}</FormMessage>
+                        </FormItem>
+                    )}
+                    />
+                <div className="border rounded-md">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[150px]">Unit of Measure</TableHead>
+                        <TableHead className="w-[100px]">Quantity</TableHead>
+                        <TableHead>Remark</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      <TableRow>
+                        <TableCell>
+                          <FormField
+                            control={form.control}
+                            name={`items.${index}.unitOfMeasure`}
+                            render={({ field }) => <Input {...field} placeholder="e.g., pcs, kg" />}
+                          />
+                          <FormMessage>{form.formState.errors.items?.[index]?.unitOfMeasure?.message}</FormMessage>
+                        </TableCell>
+                        <TableCell>
+                          <FormField
+                            control={form.control}
+                            name={`items.${index}.quantity`}
+                            render={({ field }) => (
+                              <Input type="number" {...field} />
+                            )}
+                          />
+                          <FormMessage>{form.formState.errors.items?.[index]?.quantity?.message}</FormMessage>
+                        </TableCell>
+                        <TableCell>
+                          <FormField
+                            control={form.control}
+                            name={`items.${index}.remark`}
+                            render={({ field }) => <Input {...field} placeholder="Optional" />}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </div>
+                 {fields.length > 1 && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => remove(index)}
+                      className="absolute top-2 right-2"
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  )}
+              </div>
+            ))}
           </div>
            {form.formState.errors.items?.root && (
               <p className="text-sm font-medium text-destructive">
