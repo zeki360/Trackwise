@@ -1,5 +1,6 @@
 import type { Issue } from '@/lib/types';
 
+// This is now used as fallback/mock data if Firebase is not available.
 export const issues: Issue[] = [
   {
     id: 'T-1',
@@ -10,6 +11,7 @@ export const issues: Issue[] = [
     status: 'Pending',
     assignedTo: 'Operations Manager',
     createdAt: new Date('2024-07-20T10:00:00Z'),
+    reportedBy: 'mockUser'
   },
   {
     id: 'T-2',
@@ -20,6 +22,7 @@ export const issues: Issue[] = [
     status: 'Accepted',
     assignedTo: 'IT Manager',
     createdAt: new Date('2024-07-21T09:30:00Z'),
+    reportedBy: 'mockUser'
   },
   {
     id: 'T-3',
@@ -29,6 +32,7 @@ export const issues: Issue[] = [
     status: 'Ongoing',
     assignedTo: 'Purchaser',
     createdAt: new Date('2024-07-19T14:00:00Z'),
+    reportedBy: 'mockUser'
   },
   {
     id: 'T-4',
@@ -39,6 +43,7 @@ export const issues: Issue[] = [
     status: 'Finished',
     assignedTo: 'IT Manager',
     createdAt: new Date('2024-07-18T11:00:00Z'),
+    reportedBy: 'mockUser'
   },
   {
     id: 'T-5',
@@ -49,6 +54,7 @@ export const issues: Issue[] = [
     status: 'Ongoing',
     assignedTo: 'Operations Manager',
     createdAt: new Date('2024-07-21T08:00:00Z'),
+    reportedBy: 'mockUser'
   },
   {
     id: 'T-6',
@@ -59,5 +65,6 @@ export const issues: Issue[] = [
     status: 'Pending',
     assignedTo: 'IT Manager',
     createdAt: new Date('2024-07-22T15:00:00Z'),
+    reportedBy: 'mockUser'
   },
 ];

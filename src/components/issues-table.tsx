@@ -16,6 +16,7 @@ import {
   RefreshCw,
   CheckCircle,
   MoreHorizontal,
+  FileWarning,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -26,7 +27,7 @@ import {
 import { Button } from './ui/button';
 import { format } from 'date-fns';
 
-export function IssuesTable({ issues }: { issues: Issue[] }) {
+export function IssuesTable({ issues }: { issues: Issue[] | null }) {
   const getStatusBadgeVariant = (status: Status): 'default' | 'secondary' | 'destructive' | 'outline' => {
     switch (status) {
       case 'Pending':
@@ -57,11 +58,40 @@ export function IssuesTable({ issues }: { issues: Issue[] }) {
     }
   };
 
+  const formatDate = (date: any) => {
+    if (!date) return 'N/A';
+    // Check if it's a Firebase Timestamp
+    if (date.seconds) {
+      return format(date.toDate(), 'PP');
+    }
+    // Check if it's already a Date object
+    if (date instanceof Date) {
+      return format(date, 'PP');
+    }
+    // Try to parse it as a string
+    try {
+      return format(new Date(date), 'PP');
+    } catch (e) {
+      return 'Invalid Date';
+    }
+  };
+
+  if (!issues || issues.length === 0) {
+    return (
+        <div className="flex flex-col items-center justify-center text-center gap-4 p-8 border rounded-lg mt-4">
+            <FileWarning className="h-12 w-12 text-muted-foreground" />
+            <h3 className="text-lg font-semibold">No Issues Found</h3>
+            <p className="text-muted-foreground max-w-md">
+                There are no issues matching the current filters. Try selecting a different status or category.
+            </p>
+        </div>
+    )
+  }
+
   return (
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-[100px]">ID</TableHead>
           <TableHead>Title</TableHead>
           <TableHead>Category</TableHead>
           <TableHead>Status</TableHead>
@@ -73,8 +103,7 @@ export function IssuesTable({ issues }: { issues: Issue[] }) {
       <TableBody>
         {issues.map((issue) => (
           <TableRow key={issue.id}>
-            <TableCell className="font-medium">{issue.id}</TableCell>
-            <TableCell>{issue.title}</TableCell>
+            <TableCell className="font-medium">{issue.title}</TableCell>
             <TableCell>
               <Badge variant="outline">{issue.subCategory ? `${issue.category} / ${issue.subCategory}`: issue.category}</Badge>
             </TableCell>
@@ -84,7 +113,7 @@ export function IssuesTable({ issues }: { issues: Issue[] }) {
                 <span>{issue.status}</span>
               </Badge>
             </TableCell>
-            <TableCell>{format(issue.createdAt, 'PP')}</TableCell>
+            <TableCell>{formatDate(issue.createdAt || (issue as any).dateReported)}</TableCell>
             <TableCell>{issue.assignedTo}</TableCell>
             <TableCell className="text-right">
               <DropdownMenu>
