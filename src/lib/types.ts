@@ -12,7 +12,19 @@ export type SubCategory =
   | 'Maintenance'
   | 'Accident';
 
-export type Role = 'Operations Manager' | 'IT Manager' | 'Purchaser' | 'Admin Director';
+export type Role =
+  | 'Director'
+  | 'Admin Director'
+  | 'Admin Assistant'
+  | 'HR'
+  | 'Project Funding'
+  | 'Finance Head'
+  | 'IT Director'
+  | 'Operations Manager'
+  | 'IT Manager'
+  | 'IT officer'
+  | 'Purchaser'
+  | 'Staff';
 
 export interface Issue {
   id: string;
