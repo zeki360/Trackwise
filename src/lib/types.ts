@@ -1,4 +1,3 @@
-import { Timestamp } from "firebase/firestore";
 
 export type Status = 'Pending' | 'Accepted' | 'Ongoing' | 'Finished';
 export type Category = 'Facility' | 'IT' | 'Purchase' | 'Vehicle';
@@ -36,6 +35,5 @@ export interface Issue {
   status: Status;
   assignedTo: Role;
   reportedBy: string;
-  createdAt: Date | Timestamp;
-  dateReported?: Date | Timestamp;
+  createdAt: Date;
 }

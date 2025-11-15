@@ -1,3 +1,4 @@
+
 'use client';
 
 import type { Issue, Status } from '@/lib/types';
@@ -58,24 +59,6 @@ export function IssuesTable({ issues }: { issues: Issue[] | null }) {
     }
   };
 
-  const formatDate = (date: any) => {
-    if (!date) return 'N/A';
-    // Check if it's a Firebase Timestamp
-    if (date.seconds) {
-      return format(date.toDate(), 'PP');
-    }
-    // Check if it's already a Date object
-    if (date instanceof Date) {
-      return format(date, 'PP');
-    }
-    // Try to parse it as a string
-    try {
-      return format(new Date(date), 'PP');
-    } catch (e) {
-      return 'Invalid Date';
-    }
-  };
-
   if (!issues || issues.length === 0) {
     return (
         <div className="flex flex-col items-center justify-center text-center gap-4 p-8 border rounded-lg mt-4">
@@ -113,7 +96,7 @@ export function IssuesTable({ issues }: { issues: Issue[] | null }) {
                 <span>{issue.status}</span>
               </Badge>
             </TableCell>
-            <TableCell>{formatDate(issue.createdAt || (issue as any).dateReported)}</TableCell>
+            <TableCell>{format(issue.createdAt as Date, 'PP')}</TableCell>
             <TableCell>{issue.assignedTo}</TableCell>
             <TableCell className="text-right">
               <DropdownMenu>
