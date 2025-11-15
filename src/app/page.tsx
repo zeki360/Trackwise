@@ -51,7 +51,7 @@ export default function Home() {
         </div>
         <div className="ml-auto flex items-center gap-2">
           <Button asChild variant="outline">
-            <Link href="/report?category=Purchase">
+            <Link href="/purchase-requisition">
               <ShoppingCart className="mr-2 h-4 w-4" /> Purchase Request
             </Link>
           </Button>
