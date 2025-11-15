@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { PlusCircle, Trash2 } from 'lucide-react';
+import { useEffect } from 'react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -31,7 +32,6 @@ import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 
 const itemSchema = z.object({
-  itemCode: z.string().optional(),
   description: z.string().min(1, 'Description is required.'),
   unitOfMeasure: z.string().min(1, 'Unit of Measure is required.'),
   quantity: z.coerce.number().min(1, 'Quantity must be at least 1.'),
@@ -39,6 +39,7 @@ const itemSchema = z.object({
 });
 
 const formSchema = z.object({
+  requisitionId: z.string().min(1, 'Requisition ID is required.'),
   costCenter: z.string().min(1, 'Cost Center is required.'),
   urgency: z.enum(['Routine', 'Urgent', 'Critical'], {
     required_error: 'You need to select an urgency level.',
@@ -53,7 +54,7 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-const generateUniqueItemCode = () => `ITEM-${Date.now()}-${Math.floor(Math.random() * 100)}`;
+const generateRequisitionId = () => `REQ-${Date.now()}`;
 
 export function PurchaseRequisitionForm() {
   const router = useRouter();
@@ -62,16 +63,21 @@ export function PurchaseRequisitionForm() {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      requisitionId: '',
       costCenter: '',
       urgency: 'Routine',
       requestedBy: '',
       storeRequisitionNo: '',
-      items: [{ itemCode: generateUniqueItemCode(), description: '', unitOfMeasure: '', quantity: 1, remark: '' }],
+      items: [{ description: '', unitOfMeasure: '', quantity: 1, remark: '' }],
       preparedBy: '',
       checkedBy: '',
       approvedBy: '',
     },
   });
+
+  useEffect(() => {
+    form.setValue('requisitionId', generateRequisitionId());
+  }, [form]);
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -82,7 +88,7 @@ export function PurchaseRequisitionForm() {
     console.log(values);
     toast({
       title: 'Purchase Requisition Submitted!',
-      description: `Requisition for ${values.items.length} item(s) has been created.`,
+      description: `Requisition ${values.requisitionId} has been created.`,
     });
     router.push('/');
   }
@@ -91,6 +97,19 @@ export function PurchaseRequisitionForm() {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <FormField
+            control={form.control}
+            name="requisitionId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Requisition ID</FormLabel>
+                <FormControl>
+                  <Input readOnly {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={form.control}
             name="costCenter"
@@ -175,7 +194,6 @@ export function PurchaseRequisitionForm() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[100px]">Item Code</TableHead>
                   <TableHead>Description</TableHead>
                   <TableHead className="w-[150px]">Unit of Measure</TableHead>
                   <TableHead className="w-[100px]">Quantity</TableHead>
@@ -186,13 +204,6 @@ export function PurchaseRequisitionForm() {
               <TableBody>
                 {fields.map((item, index) => (
                   <TableRow key={item.id}>
-                    <TableCell>
-                      <FormField
-                        control={form.control}
-                        name={`items.${index}.itemCode`}
-                        render={({ field }) => <Input {...field} placeholder="Unique Code" readOnly />}
-                      />
-                    </TableCell>
                     <TableCell>
                       <FormField
                         control={form.control}
@@ -254,7 +265,7 @@ export function PurchaseRequisitionForm() {
             variant="outline"
             size="sm"
             onClick={() =>
-              append({ itemCode: generateUniqueItemCode(), description: '', unitOfMeasure: '', quantity: 1, remark: '' })
+              append({ description: '', unitOfMeasure: '', quantity: 1, remark: '' })
             }
           >
             <PlusCircle className="mr-2 h-4 w-4" />
@@ -311,5 +322,3 @@ export function PurchaseRequisitionForm() {
     </Form>
   );
 }
-
-    
