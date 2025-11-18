@@ -31,7 +31,7 @@ import { Role } from '@/lib/types';
 
 const roles: Role[] = [
   'Director', 'Admin Director', 'Admin Assistant', 'HR', 'Project Funding', 
-  'Finance Head', 'IT Director', 'Operations Manager', 'IT Manager', 'IT officer', 'Staff'
+  'Finance Head', 'IT Director', 'Operations Manager', 'IT officer', 'Staff'
 ];
 
 const formSchema = z.object({
