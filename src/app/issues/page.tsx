@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import {
   Card,
   CardContent,
@@ -19,30 +19,45 @@ import {
 import { IssuesTable } from '@/components/issues-table';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import type { Issue, Category } from '@/lib/types';
-import { issues as staticIssues } from '@/lib/data';
+import { useAuth } from '@/firebase';
 
 export default function IssuesPage() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
   const searchParams = useSearchParams();
   const initialCategory = searchParams.get('category') as Category | null;
 
-  const [allIssues, setAllIssues] = useState<Issue[]>([]);
+  // This will be replaced with real-time data from Firestore
+  const [allIssues, setAllIssues] = useState<Issue[] | null>(null);
   const [filteredIssues, setFilteredIssues] = useState<Issue[]>([]);
   const [activeTab, setActiveTab] = useState('All');
 
   useEffect(() => {
-    let issuesToLoad = staticIssues;
-    if (initialCategory) {
-      issuesToLoad = staticIssues.filter(
+    if (!loading && !user) {
+      router.push('/login');
+    }
+  }, [user, loading, router]);
+
+
+  useEffect(() => {
+    // In a real app, you'd fetch this data from Firestore based on the user
+    // For now, we'll use static data for demonstration
+    const staticIssues: Issue[] = []; // Intentionally empty for now, will be fetched
+    
+    let issuesToLoad = allIssues;
+    if (initialCategory && allIssues) {
+      issuesToLoad = allIssues.filter(
         (issue) => issue.category === initialCategory
       );
     }
-    setAllIssues(issuesToLoad);
-    setFilteredIssues(issuesToLoad);
+    setFilteredIssues(issuesToLoad || []);
     setActiveTab('All');
-  }, [initialCategory]);
+  }, [initialCategory, allIssues]);
 
   const handleTabChange = (status: string) => {
     setActiveTab(status);
+    if (!allIssues) return;
+
     if (status === 'All') {
       setFilteredIssues(allIssues);
     } else {
@@ -51,6 +66,10 @@ export default function IssuesPage() {
       );
     }
   };
+
+  if (loading || !user) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="flex flex-col min-h-screen">
