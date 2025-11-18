@@ -10,12 +10,22 @@ import {
   SidebarContent,
   SidebarFooter,
 } from '@/components/ui/sidebar';
-import { Home, PlusCircle, UserCircle, List, BarChart2, ShoppingCart } from 'lucide-react';
+import { Home, PlusCircle, UserCircle, List, BarChart2, ShoppingCart, LogOut, LogIn } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useAuth } from '@/firebase';
+import { getAuth, signOut } from 'firebase/auth';
+import { Button } from '../ui/button';
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const { user, loading } = useAuth();
+
+  const handleLogout = async () => {
+    const auth = getAuth();
+    await signOut(auth);
+    // The auth listener in FirebaseClientProvider will handle the redirect.
+  };
 
   return (
     <Sidebar>
@@ -83,15 +93,38 @@ export function AppSidebar() {
         </SidebarMenu>
       </SidebarContent>
       <SidebarFooter className="p-4 mt-auto">
-        <div className="flex items-center gap-3">
-          <UserCircle className="h-10 w-10 text-primary" />
-          <div className="flex flex-col">
-            <span className="font-semibold text-primary-foreground">
-              Admin User
-            </span>
-            <span className="text-xs text-muted-foreground">Online</span>
+        {loading ? (
+           <div className="flex items-center gap-3">
+             <UserCircle className="h-10 w-10 text-primary" />
+             <div className="flex flex-col">
+               <span className="font-semibold text-primary-foreground">
+                 Loading...
+               </span>
+             </div>
+           </div>
+        ) : user ? (
+          <div className="flex items-center justify-between">
+            <div className='flex items-center gap-3'>
+              <UserCircle className="h-10 w-10 text-primary" />
+              <div className="flex flex-col">
+                <span className="font-semibold text-primary-foreground">
+                  {user.email}
+                </span>
+                <span className="text-xs text-muted-foreground">Online</span>
+              </div>
+            </div>
+            <Button variant="ghost" size="icon" onClick={handleLogout}>
+              <LogOut className="h-5 w-5 text-primary-foreground/80"/>
+            </Button>
           </div>
-        </div>
+        ) : (
+          <SidebarMenuButton asChild isActive={pathname === '/login'}>
+              <Link href="/login">
+                <LogIn />
+                <span>Login</span>
+              </Link>
+            </SidebarMenuButton>
+        )}
       </SidebarFooter>
     </Sidebar>
   );

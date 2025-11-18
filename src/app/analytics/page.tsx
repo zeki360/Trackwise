@@ -1,3 +1,4 @@
+
 'use client';
 
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, RadialBarChart, RadialBar, PolarAngleAxis } from 'recharts';
@@ -5,9 +6,21 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, RadialBarChart, RadialBar, 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { SidebarTrigger } from '@/components/ui/sidebar';
+import { useAuth } from '@/firebase';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import { issues as staticIssues } from '@/lib/data';
 
 export default function AnalyticsPage() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+  
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/login');
+    }
+  }, [user, loading, router]);
+
   const issues = staticIssues;
 
   const totalIssues = issues.length;
@@ -77,6 +90,10 @@ export default function AnalyticsPage() {
       color: 'hsl(var(--chart-1))',
     },
   };
+
+  if (loading || !user) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="flex flex-col min-h-screen">
