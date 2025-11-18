@@ -8,8 +8,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
-import { firestore } from '@/firebase/client';
+import { doc, setDoc, getFirestore } from 'firebase/firestore';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -62,6 +61,8 @@ export default function SignupPage() {
       const auth = getAuth();
       const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
       const user = userCredential.user;
+      
+      const firestore = getFirestore();
 
       // Create user profile in Firestore
       const userProfile = {
@@ -82,6 +83,7 @@ export default function SignupPage() {
       if (err.code === 'auth/email-already-in-use') {
         errorMessage = 'This email address is already in use by another account.';
       }
+      console.error('Signup error:', err); // Added for better debugging
       setError(errorMessage);
     }
   }
@@ -100,6 +102,7 @@ export default function SignupPage() {
                 <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
                   <AlertTitle>Signup Failed</AlertTitle>
+
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}
