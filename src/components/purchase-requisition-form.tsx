@@ -200,7 +200,7 @@ export function PurchaseRequisitionForm() {
                         <FormItem>
                             <FormLabel>Item Description</FormLabel>
                             <FormControl>
-                                <Textarea {...field} placeholder="Full description of the item..."/>
+                                <Textarea {...field} placeholder="Full description of the item..." className="min-h-[40px]"/>
                             </FormControl>
                             <FormMessage>{form.formState.errors.items?.[index]?.description?.message}</FormMessage>
                         </FormItem>
@@ -326,3 +326,5 @@ export function PurchaseRequisitionForm() {
     </Form>
   );
 }
+
+    
