@@ -20,6 +20,9 @@ import { IssuesTable } from '@/components/issues-table';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import type { Issue, Category } from '@/lib/types';
 import { useAuth } from '@/firebase';
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { firestore } from '@/firebase/client';
+import { issues as staticIssues } from '@/lib/data';
 
 export default function IssuesPage() {
   const { user, loading } = useAuth();
@@ -27,7 +30,6 @@ export default function IssuesPage() {
   const searchParams = useSearchParams();
   const initialCategory = searchParams.get('category') as Category | null;
 
-  // This will be replaced with real-time data from Firestore
   const [allIssues, setAllIssues] = useState<Issue[] | null>(null);
   const [filteredIssues, setFilteredIssues] = useState<Issue[]>([]);
   const [activeTab, setActiveTab] = useState('All');
@@ -38,19 +40,42 @@ export default function IssuesPage() {
     }
   }, [user, loading, router]);
 
+  useEffect(() => {
+    if (user && firestore) {
+      const issuesCollection = collection(firestore, 'issues');
+      // You might want to filter issues by user in a real app
+      // e.g., query(issuesCollection, where('reportedBy', '==', user.uid));
+      const unsubscribe = onSnapshot(issuesCollection, (snapshot) => {
+        const issuesData = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+          createdAt: doc.data().createdAt.toDate(),
+        })) as Issue[];
+        setAllIssues(issuesData);
+      }, (error) => {
+        console.error("Error fetching issues:", error);
+        setAllIssues(staticIssues); // Fallback to static data on error
+      });
+      return () => unsubscribe();
+    } else if (!loading) {
+       // If firebase is not available or user is not logged in, use static data
+       setAllIssues(staticIssues);
+    }
+  }, [user, loading]);
 
   useEffect(() => {
-    // In a real app, you'd fetch this data from Firestore based on the user
-    // For now, we'll use static data for demonstration
-    const staticIssues: Issue[] = []; // Intentionally empty for now, will be fetched
+    if (!allIssues) {
+      setFilteredIssues([]);
+      return;
+    }
     
     let issuesToLoad = allIssues;
-    if (initialCategory && allIssues) {
+    if (initialCategory) {
       issuesToLoad = allIssues.filter(
         (issue) => issue.category === initialCategory
       );
     }
-    setFilteredIssues(issuesToLoad || []);
+    setFilteredIssues(issuesToLoad);
     setActiveTab('All');
   }, [initialCategory, allIssues]);
 
@@ -58,11 +83,16 @@ export default function IssuesPage() {
     setActiveTab(status);
     if (!allIssues) return;
 
+    let baseIssues = allIssues;
+    if (initialCategory) {
+      baseIssues = allIssues.filter(issue => issue.category === initialCategory);
+    }
+
     if (status === 'All') {
-      setFilteredIssues(allIssues);
+      setFilteredIssues(baseIssues);
     } else {
       setFilteredIssues(
-        allIssues.filter((issue) => issue.status === status)
+        baseIssues.filter((issue) => issue.status === status)
       );
     }
   };
