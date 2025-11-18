@@ -193,19 +193,21 @@ export function PurchaseRequisitionForm() {
           <div className="space-y-6">
             {fields.map((item, index) => (
               <div key={item.id} className="border rounded-md p-4 space-y-4 relative">
-                 <FormField
-                    control={form.control}
-                    name={`items.${index}.description`}
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Item Description</FormLabel>
-                            <FormControl>
-                                <Textarea {...field} placeholder="Full description of the item..." className="min-h-[20px]"/>
-                            </FormControl>
-                            <FormMessage>{form.formState.errors.items?.[index]?.description?.message}</FormMessage>
-                        </FormItem>
-                    )}
-                    />
+                <div className="md:w-1/2">
+                   <FormField
+                      control={form.control}
+                      name={`items.${index}.description`}
+                      render={({ field }) => (
+                          <FormItem>
+                              <FormLabel>Item Description</FormLabel>
+                              <FormControl>
+                                  <Textarea {...field} placeholder="Full description of the item..." className="min-h-[20px]"/>
+                              </FormControl>
+                              <FormMessage>{form.formState.errors.items?.[index]?.description?.message}</FormMessage>
+                          </FormItem>
+                      )}
+                      />
+                </div>
                 <div className="border rounded-md">
                   <Table>
                     <TableHeader>
