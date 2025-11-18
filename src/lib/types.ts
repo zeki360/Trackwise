@@ -22,7 +22,6 @@ export type Role =
   | 'Finance Head'
   | 'IT Director'
   | 'Operations Manager'
-  | 'IT Manager'
   | 'IT officer'
   | 'Staff';
 
