@@ -8,7 +8,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc, getFirestore } from 'firebase/firestore';
+import { doc, setDoc } from 'firebase/firestore';
+import { firestore } from '@/firebase/client';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -62,9 +63,7 @@ export default function SignupPage() {
       const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
       const user = userCredential.user;
       
-      const firestore = getFirestore();
-
-      // Create user profile in Firestore
+      // Use the imported, initialized firestore instance
       const userProfile = {
         uid: user.uid,
         email: user.email,
