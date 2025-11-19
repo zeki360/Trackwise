@@ -3,19 +3,14 @@
 
 import {
   type User,
-  onAuthStateChanged,
-  getAuth,
 } from 'firebase/auth';
 import {
   createContext,
   useContext,
-  useEffect,
-  useState,
   type ReactNode,
 } from 'react';
-import { auth, firestore } from './client';
-import { doc, getDoc, onSnapshot } from 'firebase/firestore';
 import type { Role } from '@/lib/types';
+import { useFirebaseAuth, useUserProfile } from './provider';
 
 
 // Define the shape of the user profile data
@@ -41,49 +36,32 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 // Custom hook to access the authentication context
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+    const { user, loading: authLoading } = useFirebaseAuth();
+    const { userProfile, loading: profileLoading } = useUserProfile(user);
+
+    return {
+        user,
+        userProfile,
+        loading: authLoading || profileLoading
+    };
+};
 
 // Custom hook to access just the user profile
 export const useUser = () => {
-  const { userProfile } = useContext(AuthContext);
-  return userProfile;
+    const { user, loading: authLoading } = useFirebaseAuth();
+    const { userProfile, loading: profileLoading } = useUserProfile(user);
+    return userProfile;
 };
 
 
-// Provider component to wrap the application and provide auth state
+// This is a wrapper to maintain compatibility with the old FirebaseClientProvider
 export function FirebaseClientProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setUser(user);
-      if (user) {
-        // If user is logged in, fetch their profile
-        const userDocRef = doc(firestore, 'users', user.uid);
-        const unsubscribeSnapshot = onSnapshot(userDocRef, (doc) => {
-          if (doc.exists()) {
-            setUserProfile(doc.data() as UserProfile);
-          } else {
-            // Handle case where user is authenticated but has no profile
-            setUserProfile(null);
-          }
-          setLoading(false);
-        });
-        return () => unsubscribeSnapshot();
-      } else {
-        // If user is logged out, clear profile and finish loading
-        setUserProfile(null);
-        setLoading(false);
-      }
-    });
-
-    return () => unsubscribe();
-  }, []);
+    const { user, loading: authLoading } = useFirebaseAuth();
+    const { userProfile, loading: profileLoading } = useUserProfile(user);
 
   return (
-    <AuthContext.Provider value={{ user, userProfile, loading }}>
+    <AuthContext.Provider value={{ user, userProfile, loading: authLoading || profileLoading }}>
       {children}
     </AuthContext.Provider>
   );
