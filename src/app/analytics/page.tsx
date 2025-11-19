@@ -68,9 +68,9 @@ export default function AnalyticsPage() {
       },
       {} as Record<string, number>
     );
-  const categoryChartData = Object.keys(categoryCounts).map((category) => ({
+  const categoryChartData = relevantCategories.map((category) => ({
     name: category,
-    issues: categoryCounts[category],
+    issues: categoryCounts[category] || 0,
   }));
 
   // Data for Category Bar Chart (Fixed Issues)
@@ -82,10 +82,10 @@ export default function AnalyticsPage() {
     },
     {} as Record<string, number>
   );
-  const fixedByCategoryChartData = Object.keys(categoryFixedCounts).map(
+  const fixedByCategoryChartData = relevantCategories.map(
     (category) => ({
       name: category,
-      issues: categoryFixedCounts[category],
+      issues: categoryFixedCounts[category] || 0,
     })
   );
 
