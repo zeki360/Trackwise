@@ -147,20 +147,13 @@ export default function AnalyticsPage() {
                       cursor={false}
                       content={<ChartTooltipContent hideLabel />}
                     />
-                    <g
-                      className="transform -translate-y-1/2"
-                      transform="translate(50%, 50%)"
-                    >
-                      <text
-                        x="0"
-                        y="0"
-                        textAnchor="middle"
-                        dominantBaseline="middle"
-                        className="fill-foreground text-2xl font-bold"
-                      >
-                        {`${totalIssues > 0 ? Math.round((status.value / totalIssues) * 100) : 0}%`}
-                      </text>
-                    </g>
+                    <foreignObject x="15" y="15" width="120" height="120">
+                        <div className="w-full h-full flex items-center justify-center">
+                            <p className="fill-foreground text-2xl font-bold">
+                                {`${totalIssues > 0 ? Math.round((status.value / totalIssues) * 100) : 0}%`}
+                            </p>
+                        </div>
+                    </foreignObject>
                   </RadialBarChart>
                 </ChartContainer>
               </CardContent>
