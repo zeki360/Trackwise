@@ -10,6 +10,9 @@ import { useAuth } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { issues as staticIssues } from '@/lib/data';
+import type { Category } from '@/lib/types';
+
+const relevantCategories: Category[] = ['Facility', 'IT', 'Vehicle'];
 
 export default function AnalyticsPage() {
   const { user, loading } = useAuth();
@@ -56,20 +59,22 @@ export default function AnalyticsPage() {
   ];
 
   // Data for Category Bar Chart
-  const categoryCounts = issues.reduce(
-    (acc, issue) => {
-      acc[issue.category] = (acc[issue.category] || 0) + 1;
-      return acc;
-    },
-    {} as Record<string, number>
-  );
+  const categoryCounts = issues
+    .filter(issue => relevantCategories.includes(issue.category))
+    .reduce(
+      (acc, issue) => {
+        acc[issue.category] = (acc[issue.category] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
   const categoryChartData = Object.keys(categoryCounts).map((category) => ({
     name: category,
     issues: categoryCounts[category],
   }));
 
   // Data for Category Bar Chart (Fixed Issues)
-  const fixedIssues = issues.filter((issue) => issue.status === 'Finished');
+  const fixedIssues = issues.filter((issue) => issue.status === 'Finished' && relevantCategories.includes(issue.category));
   const categoryFixedCounts = fixedIssues.reduce(
     (acc, issue) => {
       acc[issue.category] = (acc[issue.category] || 0) + 1;
@@ -176,7 +181,7 @@ export default function AnalyticsPage() {
                     tickMargin={10}
                     axisLine={false}
                   />
-                  <YAxis />
+                  <YAxis allowDecimals={false} />
                   <ChartTooltip content={<ChartTooltipContent hideLabel />} />
                   <Bar dataKey="issues" fill="var(--color-issues)" radius={4} />
                 </BarChart>
@@ -197,7 +202,7 @@ export default function AnalyticsPage() {
                     tickMargin={10}
                     axisLine={false}
                   />
-                  <YAxis />
+                  <YAxis allowDecimals={false} />
                   <ChartTooltip content={<ChartTooltipContent hideLabel />} />
                   <Bar dataKey="issues" fill="var(--color-issues)" radius={4} />
                 </BarChart>
