@@ -8,12 +8,12 @@ import { getFirestore, Firestore, doc, onSnapshot } from 'firebase/firestore';
 import { UserProfile } from '.';
 
 const firebaseConfig = {
-    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+    apiKey: "AIzaSyC_SgfZR0dZgM06m0nhLLK2fg_aly5GowM",
+    authDomain: "we-keep-101.firebaseapp.com",
+    projectId: "we-keep-101",
+    storageBucket: "we-keep-101.firebasestorage.app",
+    messagingSenderId: "803088384039",
+    appId: "1:803088384039:web:c8e5ce8de9cde9d460dff4",
 };
 
 interface FirebaseContextType {
